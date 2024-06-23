@@ -45,12 +45,12 @@ jobs:
             console.info('Pull request number is', pullRequestNumber)
             return pullRequestNumber
 
-      - name: Deploy to Cloudflare Pages
-        uses: cloudflare/wrangler-action@v3
-        with:
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          apiToken: ${{ secrets.CLOUDFLARE_PAGES_TOKEN }}
-          command: pages deploy dist --project-name=connect --branch=${{ steps.pr.outputs.result }} --commit-dirty=true
+      # - name: Deploy to Cloudflare Pages
+      #   uses: cloudflare/wrangler-action@v3
+      #   with:
+      #     accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      #     apiToken: ${{ secrets.CLOUDFLARE_PAGES_TOKEN }}
+      #     command: pages deploy dist --project-name=connect --branch=${{ steps.pr.outputs.result }} --commit-dirty=true
 
       - name: build screenshot urls in markdown
         id: ss_urls
