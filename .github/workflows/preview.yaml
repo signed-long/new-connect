@@ -45,12 +45,20 @@ jobs:
             console.info('Pull request number is', pullRequestNumber)
             return pullRequestNumber
 
-      - name: Deploy to Cloudflare Pages
-        uses: cloudflare/wrangler-action@v3
-        with:
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          apiToken: ${{ secrets.CLOUDFLARE_PAGES_TOKEN }}
-          command: pages deploy dist --project-name=connect --branch=${{ steps.pr.outputs.result }} --commit-dirty=true
+      # - name: Deploy to Cloudflare Pages
+      #   uses: cloudflare/wrangler-action@v3
+      #   with:
+      #     accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      #     apiToken: ${{ secrets.CLOUDFLARE_PAGES_TOKEN }}
+      #     command: pages deploy dist --project-name=connect --branch=${{ steps.pr.outputs.result }} --commit-dirty=true
+
+      - name: build screenshot urls in markdown
+        id: ss_urls
+        run: |
+          for img in dist/images/*.playwright.png; do
+            md_links="$md_links\n![${img}](https://${{ steps.pr.outputs.result }}.connect-d5y.pages.dev/images/${img})"
+          done
+          echo "md_links=$md_links" >> $GITHUB_OUTPUT
 
       - name: Comment URL on PR
         uses: thollander/actions-comment-pull-request@v2
@@ -63,6 +71,8 @@ jobs:
             * post the preview on [Discord](https://discord.comma.ai); feedback from users will speedup the PR review
 
             deployed preview: https://${{ steps.pr.outputs.result }}.connect-d5y.pages.dev
+            Screenshots:
+            ${{ steps.ss_urls.outputs.md_links }}
           comment_tag: run_id
           pr_number: ${{ steps.pr.outputs.result }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
