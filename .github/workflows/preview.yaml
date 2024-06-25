@@ -87,7 +87,7 @@ jobs:
         run: |
           for img in dist/images/*.playwright.png; do
             img=$(basename $img)
-            md_links="$md_links<br/>![${img}](https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect-pr-${{ steps.pr.outputs.result }}/new-connect/screenshots/${img})"
+            md_links="$md_links<br/>![${img}](https://raw.githubusercontent.com/signed-long/ci-artifacts/new-connect-pr-${{ steps.pr.outputs.result }}/new-connect/screenshots/${img})"
           done
           echo "md_links=$md_links" >> $GITHUB_OUTPUT
 
@@ -107,3 +107,4 @@ jobs:
           comment_tag: run_id
           pr_number: ${{ steps.pr.outputs.result }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
