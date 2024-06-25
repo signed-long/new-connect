@@ -54,7 +54,7 @@ jobs:
 
       - name: take screenshots
         run: |
-          bun run build
+          bun install --frozen-lockfile
           bun playwright install chromium
           bun run dev &
           while ! curl http://localhost:3000; do sleep 0.5; done > /dev/null
