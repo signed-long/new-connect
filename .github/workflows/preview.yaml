@@ -63,7 +63,9 @@ jobs:
 
       - name: upload screenshots to commaai/ci-artifacts
         run: |
-          echo "${{ secrets.CI_ARTIFACTS_DEPLOY_KEY }}" > ~/.ssh/deploy_key 
+          cat <<EOF > ~/.ssh/deploy_key
+          ${{ secrets.CI_ARTIFACTS_DEPLOY_KEY }}
+          EOF
           cat <<EOF > ~/.ssh/config
           Host github.com
             HostName github.com
