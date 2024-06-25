@@ -52,11 +52,42 @@ jobs:
       #     apiToken: ${{ secrets.CLOUDFLARE_PAGES_TOKEN }}
       #     command: pages deploy dist --project-name=connect --branch=${{ steps.pr.outputs.result }} --commit-dirty=true
 
+      - name: take screenshots
+        run: |
+          bun run build
+          bun playwright install chromium
+          bun run dev &
+          while ! curl http://localhost:3000; do sleep 0.5; done > /dev/null
+          node src/ci/screenshots.cjs http://localhost:3000
+          kill -9 $(lsof -t -i:3000)
+
+      - name: upload screenshots to commaai/ci-artifacts
+        run: |
+          echo "${{ secrets.CI_ARTIFACTS_DEPLOY_KEY }}" > ~/.ssh/deploy_key 
+          cat <<EOF > ~/.ssh/config
+          Host github.com
+            HostName github.com
+            User git
+            IdentityFile ~/.ssh/deploy_key
+          EOF
+          chmod 600 ~/.ssh/deploy_key
+
+          git clone --depth 1 git@github.com:signed-long/ci-artifacts.git
+          mv screenshots ci-artifacts/new-connect/
+          cd ci-artifacts
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
+          git checkout -B new-connect-pr-${{ steps.pr.outputs.result }}
+          git add new-connect/screenshots
+          git commit -m "screenshots for PR ${{ steps.pr.outputs.result }}
+          git push --set-upstream origin new-connect-pr-${{ steps.pr.outputs.result }}
+
       - name: build screenshot urls in markdown
         id: ss_urls
         run: |
           for img in dist/images/*.playwright.png; do
-            md_links="$md_links\n![${img}](https://${{ steps.pr.outputs.result }}.connect-d5y.pages.dev/images/${img})"
+            img=$(basename $img)
+            md_links="$md_links<br/>![${img}](https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect-pr-${{ steps.pr.outputs.result }}/new-connect/screenshots/${img})"
           done
           echo "md_links=$md_links" >> $GITHUB_OUTPUT
 
