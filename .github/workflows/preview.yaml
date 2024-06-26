@@ -52,18 +52,25 @@ jobs:
       #     apiToken: ${{ secrets.CLOUDFLARE_PAGES_TOKEN }}
       #     command: pages deploy dist --project-name=connect --branch=${{ steps.pr.outputs.result }} --commit-dirty=true
 
+      - name: Checkout ci-artifacts
+        uses: actions/checkout@v4
+        with: 
+          repository: signed-long/ci-artifacts
+          ref: master
+
       - name: take screenshots
         run: |
           bun install --frozen-lockfile
-          bun playwright install chromium
-          bun run dev &
-          while ! curl http://localhost:3000; do sleep 0.5; done > /dev/null
-          node src/ci/screenshots.cjs http://localhost:3000
-          kill -9 $(lsof -t -i:3000)
+          node src/ci/screenshots.cjs https://new-connect.connect-d5y.pages.dev ./ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}
 
-      - name: upload screenshots to commaai/ci-artifacts
+      - name: Setup deplpy key
         run: |
-          echo "${{ secrets.CI_ARTIFACTS_DEPLOY_KEY }}" > ~/.ssh/deploy_key 
+          mkdir -p ~/.ssh
+          touch ~/.ssh/deploy_key
+          cat <<EOF > ~/.ssh/deploy_key
+          ${{ secrets.CI_ARTIFACTS_DEPLOY_KEY }}
+          EOF
+
           cat <<EOF > ~/.ssh/config
           Host github.com
             HostName github.com
@@ -72,13 +79,13 @@ jobs:
           EOF
           chmod 600 ~/.ssh/deploy_key
 
-          git clone --depth 1 git@github.com:signed-long/ci-artifacts.git
-          mv screenshots ci-artifacts/new-connect/
-          cd ci-artifacts
+      - name: Push Screenshots
+        working-directory: ci-artifacts
+        run: |
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
           git checkout -B new-connect-pr-${{ steps.pr.outputs.result }}
-          git add new-connect/screenshots
+          git add new-connect
           git commit -m "screenshots for PR ${{ steps.pr.outputs.result }}
           git push --set-upstream origin new-connect-pr-${{ steps.pr.outputs.result }}
 
