@@ -75,15 +75,6 @@ jobs:
           git commit -m "screenshots for PR #${{ steps.pr.outputs.result }}"
           git push
 
-      - name: build screenshot urls in markdown
-        id: ss_urls
-        run: |
-          for img in ${{ github.workspace }}/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/*.png; do
-            img=$(basename $img)
-            md_links="$md_links<br/>![${img}](https://raw.githubusercontent.com/signed-long/ci-artifacts/main/new-connect/pr-${{ steps.pr.outputs.result }}/${img})"
-          done
-          echo "md_links=$md_links" >> $GITHUB_OUTPUT
-
       - name: Comment URL on PR
         uses: thollander/actions-comment-pull-request@v2
         with:
@@ -95,8 +86,25 @@ jobs:
             * post the preview on [Discord](https://discord.comma.ai); feedback from users will speedup the PR review
 
             deployed preview: https://${{ steps.pr.outputs.result }}.connect-d5y.pages.dev
-            Screenshots:
-            ${{ steps.ss_urls.outputs.md_links }}
+            ### Mobile
+            <table>
+              <tr>
+                <td><img src="https://raw.githubusercontent.com/signed-long/ci-artifacts/main/new-connect/pr-${{ steps.pr.outputs.result }}/Login-mobile.playwright.png"></td>
+                <td><img src="https://raw.githubusercontent.com/signed-long/ci-artifacts/main/new-connect/pr-${{ steps.pr.outputs.result }}/RouteActivity-mobile.playwright.png"></td>
+                <td><img src="https://raw.githubusercontent.com/signed-long/ci-artifacts/main/new-connect/pr-${{ steps.pr.outputs.result }}/RouteList-mobile.playwright.png"></td>
+              </tr>
+            </table>
+
+            ### Desktop
+            <table>
+              <tr>
+                <img src="https://raw.githubusercontent.com/signed-long/ci-artifacts/main/new-connect/pr-${{ steps.pr.outputs.result }}/Login-desktop.playwright.png">
+                <img src="https://raw.githubusercontent.com/signed-long/ci-artifacts/main/new-connect/pr-${{ steps.pr.outputs.result }}/RouteActivity-desktop.playwright.png">
+                <img src="https://raw.githubusercontent.com/signed-long/ci-artifacts/main/new-connect/pr-${{ steps.pr.outputs.result }}/RouteList-desktop.playwright.png">
+              </tr>
+            </table>
           comment_tag: run_id
           pr_number: ${{ steps.pr.outputs.result }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
