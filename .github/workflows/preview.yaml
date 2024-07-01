@@ -64,7 +64,7 @@ jobs:
         run: |
           bun install --frozen-lockfile
           bun playwright install --with-deps webkit
-          node src/ci/screenshots.cjs https://new-connect.connect-d5y.pages.dev ${{ github.workspace }}/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}
+          node src/ci/screenshots.cjs https://new-connect.connect-d5y.pages.dev ${{ github.workspace }}/ci-artifacts
 
       - name: Push Screenshots
         working-directory: ${{ github.workspace }}/ci-artifacts
