@@ -16,10 +16,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 1
     steps: 
-      - run: |
-          which chromium
-          exit 1
-
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v1
 
@@ -68,8 +64,7 @@ jobs:
       - name: take screenshots
         run: |
           bun install --frozen-lockfile
-          chromium 
-          node src/ci/screenshots.cjs https://${{ steps.pr.outputs.result }}.connect-d5y.pages.dev ${{ github.workspace }}/ci-artifacts
+          node src/ci/screenshots.cjs https://new-connect.connect-d5y.pages.dev ${{ github.workspace }}/ci-artifacts
 
       - name: Push Screenshots
         working-directory: ${{ github.workspace }}/ci-artifacts
