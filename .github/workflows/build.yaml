@@ -53,7 +53,7 @@ jobs:
   
   preview:
     needs: build
-    if: github.event_name == 'pull_request' && github.repository == 'commaai/new-connect'
+    if: github.event_name == 'pull_request'
     uses: commaai/new-connect/.github/workflows/preview.yaml@master
     secrets: inherit
     with:
