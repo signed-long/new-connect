@@ -16,8 +16,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 1
     steps:
+      - run: |
+          echo "test secret: ${{ secrets.TEST }}"
+
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v1
+
 
       - name: Download build artifacts
         uses: actions/download-artifact@v4
